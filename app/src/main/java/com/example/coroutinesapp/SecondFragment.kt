@@ -16,8 +16,6 @@ class SecondFragment : Fragment() {
 
     private lateinit var binding: FragmentSecondBinding
 
-    private var count = 0
-
     private var secondsCounter = 1
 
     private var pauseOffset: Long = 0
@@ -33,24 +31,10 @@ class SecondFragment : Fragment() {
         binding = FragmentSecondBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         binding.chronometer.setOnChronometerTickListener {
-            /*
-            millis = SystemClock.elapsedRealtime() - binding.chronometer.base
-            if ((SystemClock.elapsedRealtime() - binding.chronometer.base) / 10000 == 0L){
-                binding.viewFragment.setBackgroundResource(R.color.purple_200)
-            }
-            millis++
-
-             */
             val millis: Long = (SystemClock.elapsedRealtime() - binding.chronometer.base)
             if (millis / secondsCounter in 20000..20999) {
                 secondsCounter++
-                if (count == 0) {
-                    count = 1
-                    randomColor()
-                } else {
-                    count = 0
-                    randomColor()
-                }
+                randomColor()
             }
         }
         binding.startButton.setOnClickListener {
@@ -75,13 +59,18 @@ class SecondFragment : Fragment() {
         }
         binding.restartButton.setOnClickListener {
             restartChronometer()
-            viewModel.stopPI()
-            viewModel.count = 0
-            viewModel.isRestart = true
-            viewModel.running = true
-            viewModel.startPI()
+
+            initRestartViewModel()
         }
         return binding.root
+    }
+
+    private fun initRestartViewModel() {
+        viewModel.stopPI()
+        viewModel.count = 0
+        viewModel.isRestart = true
+        viewModel.running = true
+        viewModel.startPI()
     }
 
     private fun startChronometer() {
@@ -97,7 +86,9 @@ class SecondFragment : Fragment() {
     private fun restartChronometer() {
         binding.chronometer.base = SystemClock.elapsedRealtime()
         pauseOffset = 0
+        secondsCounter = 1
         startChronometer()
+        chronometerIsRun = true
     }
 
 
